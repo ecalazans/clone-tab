@@ -11,62 +11,41 @@ export default function StatusPage() {
   return (
     <>
       <h1>Status</h1>
-      <UpdatedAt />
-      <VersionDataBase />
-      <MaxConnections />
-      <OpenedConnections />
+      <h3>Banco de Dados</h3>
+      <StatusDataBase />
     </>
   );
 }
 
-function UpdatedAt() {
+function StatusDataBase() {
   const { isLoading, data } = useSWR("/api/v1/status", fetchAPI, {
     refreshInterval: 2000,
   });
 
-  let updatedAtText = "Carregando...";
-  if (!isLoading && data) {
-    updatedAtText = new Date(data.updated_at).toLocaleString("pt-br");
+  if (isLoading || !data) {
+    return (
+      <>
+        <div>Última atualização: Carregando...</div>
+        <div>Versão do Banco: Carregando...</div>
+        <div>Máximo de conexões permitidas: Carregando...</div>
+        <div>Conexões em uso: Carregando...</div>
+      </>
+    );
   }
 
-  return <div>Última atualização: {updatedAtText}</div>;
-}
-
-function VersionDataBase() {
-  const { isLoading, data } = useSWR("/api/v1/status", fetchAPI, {
-    refreshInterval: 2000,
-  });
-
-  let versionDataBase = "Carregando...";
-  if (!isLoading && data) {
-    versionDataBase = data.dependencies.database.version;
-  }
-
-  return <div>Versão do Banco: {versionDataBase}</div>;
-}
-
-function MaxConnections() {
-  const { isLoading, data } = useSWR("/api/v1/status", fetchAPI, {
-    refreshInterval: 2000,
-  });
-
-  let maxConnections = "Carregando...";
-  if (!isLoading && data) {
-    maxConnections = data.dependencies.database.max_connections;
-  }
-
-  return <div>Máximo de conexões permitidas: {maxConnections}</div>;
-}
-
-function OpenedConnections() {
-  const { isLoading, data } = useSWR("/api/v1/status", fetchAPI, {
-    refreshInterval: 2000,
-  });
-
-  let openedConnections = "Carregando...";
-  if (!isLoading && data) {
-    openedConnections = data.dependencies.database.opened_connections;
-  }
-
-  return <div>Conexões em uso: {openedConnections}</div>;
+  return (
+    <>
+      <div>
+        Última atualização: {new Date(data.updated_at).toLocaleString("pt-BR")}
+      </div>
+      <div>Versão do Banco: {data.dependencies.database.version}</div>
+      <div>
+        Máximo de conexões permitidas:{" "}
+        {data.dependencies.database.max_connections}
+      </div>
+      <div>
+        Conexões em uso: {data.dependencies.database.opened_connections}
+      </div>
+    </>
+  );
 }
